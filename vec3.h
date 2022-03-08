@@ -87,6 +87,9 @@ public:
 public:
 	double e[3];
 };
-
 using point3 = vec3;
 using color = vec3;
+
+inline vec3 operator*(double d, const vec3& to) {
+	return to * d;
+}
