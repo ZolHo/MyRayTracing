@@ -1,0 +1,3 @@
+D:/workspace/MyRayTracing/CMakeFiles/MyRayTracing.dir
+D:/workspace/MyRayTracing/CMakeFiles/ALL_BUILD.dir
+D:/workspace/MyRayTracing/CMakeFiles/ZERO_CHECK.dir

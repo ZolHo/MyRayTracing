@@ -2,8 +2,9 @@
 
 #include <cmath>
 #include <iostream>
+#include "tools.h"
 using std::sqrt;
-
+using std::cout;
 class vec3 {
 public:
 	//ππ‘Ï
@@ -24,6 +25,9 @@ public:
 	}
 	vec3 operator*(double d) const {
 		return vec3(d*e[0], d*e[1], d*e[2]);
+	}
+	vec3 operator*(vec3 v) const {
+		return vec3(v.e[0] * e[0], v.e[1] * e[1], v.e[2] * e[2]);
 	}
 	vec3 operator/(double d) const {
 		if (d != 0) return *this * (1 / d);
@@ -84,6 +88,7 @@ public:
 		return *this / lenth();
 	}
 
+
 public:
 	double e[3];
 };
@@ -92,4 +97,15 @@ using color = vec3;
 
 inline vec3 operator*(double d, const vec3& to) {
 	return to * d;
+}
+
+inline vec3 reflect(const vec3& v, const vec3& n) {
+	return v - 2 * v.dot(n) * n;  //sin(a+90) = cos(a)
+}
+
+inline vec3 random_unit_vector() {
+	auto a = random_double(0, 2 * pi);
+	auto z = random_double(-1, 1);
+	auto r = sqrt(1 - z * z);
+	return vec3(r * cos(a), r * sin(a), z);
 }
