@@ -7,6 +7,8 @@ struct hit_info;
 
 class material {
 public:
+    bool is_light = false;
+public:
 	virtual bool scatter(const ray& r_in, const hit_info& rec, color& attenuation, ray& scattered) const = 0;
 };
 
@@ -36,5 +38,19 @@ public:
         scattered.ori = rec.hit_pos;
         attenuation = albedo;
         return (scattered.direction().dot(rec.normal) > 0);
+    }
+};
+
+// 光源
+class light : public material {
+public:
+    color light_color;
+    double indensity;
+public:
+    light(const color& c) : light_color(c) {
+        is_light = true;
+    }
+    virtual bool scatter(const ray& r_in, const hit_info& rec, color& attenuation, ray& scattered) const override {
+        return true;
     }
 };

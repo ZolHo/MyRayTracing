@@ -13,7 +13,7 @@ using std::sqrt;
 
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-const float FLOAT_DIS = 0.0001;
+const float FLOAT_DIS = 0.0005;
 #define abs(a) (a>0? a : -a)
 
 //³£Á¿

@@ -1,8 +1,14 @@
 #pragma once
 #include "vec3.h"
 #include "hitable.h"
-class sq_area_light :public hitable {
+#include "tools.h"
+#include "box.h"
+
+class box_light :public box {
 public:
-	vec3 ori;
-	float len;
+	box_light(const point3& ori, const vec3& xyz, const shared_ptr<material>& m) : box (box_ori, xyz_half_len, mat_ptr){
+		box_ori = ori;
+		xyz_half_len = xyz;
+		mat_ptr = m;
+	}
 };

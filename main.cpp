@@ -10,7 +10,7 @@
 #include <cmath>
 #include <algorithm>
 #include "box.h"
-
+#include "light_source.h"
 using std::cin;
 using std::cout;
 using std::vector;
@@ -35,11 +35,13 @@ color ray_color(const ray& r, const vector<shared_ptr<hitable>>& things, int dee
 	if (deep <= 0) return color(0, 0, 0);
 	if (muti_hit(r, things, 0.00001, infinity, rec) && (*(rec.mat_ptr)).scatter(r, rec, att, sca)) {
 		//(*(rec.mat_ptr)).scatter(r, rec, att, sca);
+		if (rec.mat_ptr->is_light) return color(1, 1, 1);
 		return att * ray_color(sca, things, deep-1);
 	}
-	vec3 unit_direction = r.direction().unit();
-	double t = 0.5 * (unit_direction.y() + 1.0);
-	return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+	return color(0, 0, 0);
+	//vec3 unit_direction = r.direction().unit();
+	//double t = 0.5 * (unit_direction.y() + 1.0);
+	//return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 // 处理光线多个物体的求交，返回在前面的交点的hit info
 bool muti_hit(const ray& r, const vector<shared_ptr<hitable>>& things, double t_begin, double t_end, hit_info& rec) {
@@ -54,6 +56,7 @@ bool muti_hit(const ray& r, const vector<shared_ptr<hitable>>& things, double t_
 	}
 	return is_hit;
 }
+
 void write_color(std::ostream& out, color pixel_color, int samping) {
 	auto r = pixel_color.x();
 	auto g = pixel_color.y();
@@ -72,26 +75,42 @@ void write_color(std::ostream& out, color pixel_color, int samping) {
 int main() {
 	srand((unsigned int)time(NULL));//随机种子
 	const double aspect_ratio = 16.0 / 9.0;
-	const int pixel_width = 16 * 30;
+	const int pixel_width = 16 * 80;
 	const int pixel_height = static_cast<int> (pixel_width / aspect_ratio);
 	const bool is_ssaa = false;   //是否开启4倍超采样
     const bool is_random_select = true;
 
-	const int ray_deep = 8;
-	const int pixel_samping = 25;
+	const int ray_deep = 10;
+	const int pixel_samping = 2000;
     shared_ptr<lambertian> lbt_ptr(new lambertian({1-117./255.,1-49./255.,1- 142./255.}));
+	shared_ptr<lambertian> lbt_red(new lambertian({ 0.9,0,0 }));
+	shared_ptr<lambertian> lbt_green(new lambertian({ 0,0.9,0 }));
+	shared_ptr<lambertian> lbt_white(new lambertian({ 0.9,0.9,0.9 }));
 	shared_ptr<lambertian> lbt_ptr2(new lambertian({ 117. / 255., 49. / 255.,  142. / 255. }));
 	shared_ptr<lambertian> lbt_ptr3(new lambertian({ random_double(), random_double(), random_double() }));
-	shared_ptr<metal> metal_ptr(new metal({ 0.7, 0.73, 0.67 }));
+	shared_ptr<metal> metal_ptr(new metal({ 0.85, 0.83, 0.87 }));
+	shared_ptr<light> light_ptr(new light({ 0.9,0.9,0.9 }));
 
 	// world
 	vector<shared_ptr<hitable>> world;
-	world.push_back(make_shared<sphere>(point3(0, 0, -1), 0.5, lbt_ptr2));
-	world.push_back(make_shared<sphere>(point3(0, -100.5, -1), 100, lbt_ptr));
-	world.push_back(make_shared<sphere>(point3(-14, 0, -20), 15, lbt_ptr2));
-	world.push_back(make_shared<box>(point3(-1, 0.2, -0.5), vec3(1., 1., 1.), metal_ptr));
-	world.push_back(make_shared<sphere>(point3(1, 0, -1), 0.4, lbt_ptr3));
-	world.push_back(make_shared<box>(point3(4, 2, -2), vec3(2., 8., 10.), metal_ptr));
+	//world.push_back(make_shared<sphere>(point3(0, 0, -1), 0.5, lbt_ptr2));
+	//world.push_back(make_shared<sphere>(point3(0, -100.5, -1), 100, lbt_ptr));
+	//world.push_back(make_shared<sphere>(point3(-14, 0, -20), 15, lbt_ptr2));
+	//world.push_back(make_shared<box>(point3(-1, 0.2, -0.5), vec3(1., 1., 1.), metal_ptr));
+	//world.push_back(make_shared<sphere>(point3(1, 0, -1), 0.4, lbt_ptr3));
+	////world.push_back(make_shared<box>(point3(4, 2, -2), vec3(2., 8., 10.), metal_ptr));
+	//world.push_back(make_shared<box_light>(point3(0, 3, -2), vec3(1, 0.1, 1), light_ptr));
+
+	world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
+	world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
+	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
+	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
+	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
+	world.push_back(make_shared<box_light>(point3(0, 1.98, -2), vec3(1, 0.04, 1), light_ptr));
+	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
+	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
+
 
 	// 相机
 	camera cam;

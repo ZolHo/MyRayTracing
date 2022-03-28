@@ -30,9 +30,9 @@ public:
 
 		float in_max = times_in.max_v();
 		float out_min = times_out.min_v();
-		float hit_time = in_max;
+		float hit_time = in_max > 0?in_max:out_min;
 
-		if (in_max < 0 || out_min<0 || in_max > out_min || hit_time<time_begin || hit_time>time_end ) return false;
+		if (in_max <= 0 || out_min <= 0 || in_max >= out_min || hit_time<time_begin || hit_time>time_end ) return false;
 
 		hit_result.hit_pos = r.at(hit_time);
 		hit_result.distance = (hit_result.hit_pos - r.ori).lenth();
@@ -47,13 +47,14 @@ public:
 			case(0): normal = vec3((hit_result.hit_pos.x() > box_ori.x() ? 1 : -1), 0, 0); break;
 			case(1): normal = vec3(0, (hit_result.hit_pos.y() > box_ori.y() ? 1 : -1), 0); break;
 			case(2): normal = vec3(0, 0,( hit_result.hit_pos.z() > box_ori.z() ? 1 : -1)); break;
-			default: times_in << (cout); cout << hit_time <<" "<< hit_time - times_in.e[2] <<" "<< abs(hit_time - times_in.e[2])<< std::endl;
+			//default: times_in << (cout); cout << hit_time <<" "<< hit_time - times_in.e[2] <<" "<< abs(hit_time - times_in.e[2])<< std::endl;
+			default: normal = vec3();
 		}
-		//hit_result.set_face_normal(r, normal);
+		hit_result.set_face_normal(r, normal);
 		//(hit_result.hit_pos) << (cout);
 		//normal << (cout);
 		//cout << std::endl;
-		hit_result.normal = normal;
+		//hit_result.normal = normal;
 		return true;
 		
 	}
