@@ -5,6 +5,7 @@
 #include "tools.h"
 using std::sqrt;
 using std::cout;
+
 class vec3 {
 public:
 	//构造
@@ -26,11 +27,21 @@ public:
 	vec3 operator*(double d) const {
 		return vec3(d*e[0], d*e[1], d*e[2]);
 	}
-	vec3 operator*(vec3 v) const {
+	vec3 operator*(const vec3& v) const {
 		return vec3(v.e[0] * e[0], v.e[1] * e[1], v.e[2] * e[2]);
 	}
 	vec3 operator/(double d) const {
 		if (d != 0) return *this * (1 / d);
+	}
+	vec3 operator/(const vec3& v) const {
+		vec3 rs;
+		if (abs(v.e[0]) < FLOAT_DIS) rs.e[0] = infinity;
+		else rs.e[0] = e[0] / v.e[0];
+		if (abs(v.e[1]) < FLOAT_DIS) rs.e[1] = infinity;
+		else rs.e[1] = e[1] / v.e[1];
+		if (abs(v.e[2]) < FLOAT_DIS) rs.e[2] = infinity;
+		else rs.e[2] = e[2] / v.e[2];
+		return rs;
 	}
 	vec3& operator+=(const vec3& to) {
 		e[0] += to.e[0];
@@ -86,6 +97,22 @@ public:
 	//单位化
 	vec3 unit() const { 
 		return *this / lenth();
+	}
+
+	// 求最值
+	double min_v() {
+		double rs = infinity;
+		for (auto v : e) {
+			if (v < infinity && v > -infinity && v < rs) rs = v;
+		}
+		return rs;
+	}
+	double max_v() {
+		double rs = -infinity;
+		for (auto v : e) {
+			if (v < infinity && v > -infinity && v > rs) rs = v;
+		}
+		return rs;
 	}
 
 

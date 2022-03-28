@@ -70,27 +70,28 @@ void write_color(std::ostream& out, color pixel_color, int samping) {
 }
 
 int main() {
+	srand((unsigned int)time(NULL));//随机种子
 	const double aspect_ratio = 16.0 / 9.0;
-	const int pixel_width = 16 * 80;
+	const int pixel_width = 16 * 30;
 	const int pixel_height = static_cast<int> (pixel_width / aspect_ratio);
 	const bool is_ssaa = false;   //是否开启4倍超采样
     const bool is_random_select = true;
 
-	const int ray_deep = 6;
-	const int pixel_samping = 30;
+	const int ray_deep = 8;
+	const int pixel_samping = 25;
     shared_ptr<lambertian> lbt_ptr(new lambertian({1-117./255.,1-49./255.,1- 142./255.}));
 	shared_ptr<lambertian> lbt_ptr2(new lambertian({ 117. / 255., 49. / 255.,  142. / 255. }));
 	shared_ptr<lambertian> lbt_ptr3(new lambertian({ random_double(), random_double(), random_double() }));
-	shared_ptr<metal> metal_ptr(new metal({ 0.6, 0.9, 0.7 }));
+	shared_ptr<metal> metal_ptr(new metal({ 0.7, 0.73, 0.67 }));
 
 	// world
 	vector<shared_ptr<hitable>> world;
-	world.push_back(make_shared<sphere>(point3(0, 0, -1), 0.5, metal_ptr));
+	world.push_back(make_shared<sphere>(point3(0, 0, -1), 0.5, lbt_ptr2));
 	world.push_back(make_shared<sphere>(point3(0, -100.5, -1), 100, lbt_ptr));
-	world.push_back(make_shared<sphere>(point3(-14, 0, 20), 15, lbt_ptr2));
-	world.push_back(make_shared<box>(point3(-4, 4, 0.), vec3(4., 4., 4.), lbt_ptr3));
+	world.push_back(make_shared<sphere>(point3(-14, 0, -20), 15, lbt_ptr2));
+	world.push_back(make_shared<box>(point3(-1, 0.2, -0.5), vec3(1., 1., 1.), metal_ptr));
 	world.push_back(make_shared<sphere>(point3(1, 0, -1), 0.4, lbt_ptr3));
-	//world.push_back(make_shared<sphere>(point3(0, 0, 0), 20, lbt_ptr));
+	world.push_back(make_shared<box>(point3(4, 2, -2), vec3(2., 8., 10.), metal_ptr));
 
 	// 相机
 	camera cam;
