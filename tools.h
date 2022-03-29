@@ -11,10 +11,10 @@ using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
 
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#define min(a,b) (((a) < (b)) ? (a) : (b))
+#define my_max(a,b) (((a) > (b)) ? (a) : (b))
+#define my_min(a,b) (((a) < (b)) ? (a) : (b))
 const float FLOAT_DIS = 0.0005;
-#define abs(a) (a>0? a : -a)
+#define my_abs(a) (a>0? a : -a)
 
 //常量
 const double infinity = std::numeric_limits<double>::infinity(); //无穷大

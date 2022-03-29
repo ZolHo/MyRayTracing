@@ -24,8 +24,8 @@ public:
 		times_in = (box_ori - xyz_half_len - r.ori) / (r.direction());
 		times_out = (box_ori + xyz_half_len - r.ori) / (r.direction());
 
-		temp = vec3(min(times_in.x(), times_out.x()), min(times_in.y(), times_out.y()), min(times_in.z(), times_out.z()));
-		times_out = vec3(max(times_in.x(), times_out.x()), max(times_in.y(), times_out.y()), max(times_in.z(), times_out.z()));
+		temp = vec3(my_min(times_in.x(), times_out.x()), my_min(times_in.y(), times_out.y()), my_min(times_in.z(), times_out.z()));
+		times_out = vec3(my_max(times_in.x(), times_out.x()), my_max(times_in.y(), times_out.y()), my_max(times_in.z(), times_out.z()));
 		times_in = temp;
 
 		float in_max = times_in.max_v();
@@ -39,7 +39,7 @@ public:
 		hit_result.mat_ptr = mat_ptr;
 		int temp_i = 0;
 		for (; temp_i < 3; temp_i++) {
-			if (abs(hit_time - times_in.e[temp_i]) < FLOAT_DIS ) break;
+			if (my_abs(hit_time - times_in.e[temp_i]) < FLOAT_DIS ) break;
 			//if (hit_time == times_in.e[temp_i]) break;
 		}
 		vec3 normal;
