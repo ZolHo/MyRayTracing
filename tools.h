@@ -13,8 +13,8 @@ using std::sqrt;
 
 inline float my_max(float a, float b) { return a > b ? a : b; }
 inline float my_min(float a, float b) { return a < b ? a : b; }
-const float FLOAT_DIS = 0.00005;
-inline float my_abs(float a) { return a > 0 ? a : -a; }
+const float FLOAT_DIS = 0.000000005;
+//inline float fabs(float a) { return a > 0 ? a : -a; }
 
 //常量
 const double infinity = std::numeric_limits<double>::infinity(); //无穷大

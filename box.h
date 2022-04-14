@@ -39,7 +39,7 @@ public:
 		hit_result.mat_ptr = mat_ptr;
 		int temp_i = 0;
 		for (; temp_i < 3; temp_i++) {
-			if (my_abs(hit_time - times_in.e[temp_i]) < FLOAT_DIS ) break;
+			if (fabs(hit_time - times_in.e[temp_i]) < FLOAT_DIS ) break;
 			//if (hit_time == times_in.e[temp_i]) break;
 		}
 		vec3 normal;
@@ -49,6 +49,7 @@ public:
 			case(2): normal = vec3(0, 0,( hit_result.hit_pos.z() > box_ori.z() ? 1 : -1)); break;
 			//default: times_in << (cout); cout << hit_time <<" "<< hit_time - times_in.e[2] <<" "<< abs(hit_time - times_in.e[2])<< std::endl;
 			default: normal = vec3();
+				cout << "Error: float value equal error" << std::endl;
 		}
 		hit_result.set_face_normal(r, normal);
 		//(hit_result.hit_pos) << (cout);

@@ -169,11 +169,10 @@ int main(int argc, char *argv[]) {
             for (int p = 0; p < pixel_samping; p++) {
                 double ut = u + random_double(0,1)* unit_pixel[0];
                 double vt = v + random_double(0,1) * unit_pixel[1];
-                r = cam.get_ray(ut, vt);
-				//r = cam.get_ray(u, v);
+                //r = cam.get_ray(ut, vt);
+				r = cam.get_ray(u, v);
                 auto temp = ray_color(r,world);
                 sum_col+=temp;
-				//if (temp.lenth() > 0.9) temp << (cout);
             }
 			final_col = sum_col;
 			write_color(out_file, final_col, pixel_samping);
