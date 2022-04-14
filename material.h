@@ -54,3 +54,19 @@ public:
         return true;
     }
 };
+
+// 我设想的glossy算法
+class glossy : public material {
+public :
+    color albedo;
+    unsigned int glossy_intensity = 0; // 该值越大越接近镜面，越小越接近漫反射
+public :
+    glossy(const color& c, int intensity) : albedo (c), glossy_intensity(intensity) {}
+
+    virtual bool scatter(const ray& r_in, const hit_info& rec, color& attenuation, ray& scattered) const override {
+        vec3 scatter_direction = rec.normal * (glossy_intensity + 1) + random_unit_vector();
+        scattered = ray(rec.hit_pos, scatter_direction);
+        attenuation = albedo;
+        return true;
+    }
+};

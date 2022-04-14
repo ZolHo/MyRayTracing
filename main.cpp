@@ -27,10 +27,11 @@ bool is_RR = true;
 // 画面自定义参数
 int samping = 300; // samping per pixel
 int pixel_width = 1080; // 屏幕宽
-char* file_name = "test2.ppm";
+char* file_name = "test.ppm";
 
 bool muti_hit(const ray& r, const vector<shared_ptr<hitable>>& things, double t_begin, double t_end, hit_info& rec);
 
+//自定义 clamp模板函数
 template<class T>
 T clamp(T x, T min, T max)
 {
@@ -40,6 +41,7 @@ T clamp(T x, T min, T max)
 		return min;
 	return x;
 }
+
 color ray_color(const ray& r, const vector<shared_ptr<hitable>>& things, int deep) {
 	hit_info rec;
 	color att;
@@ -96,6 +98,7 @@ void write_color(std::ostream& out, color pixel_color, int samping) {
 }
 
 int main(int argc, char *argv[]) {
+	// 传参控制采样数，分辨率， 文件名
 	if (argc > 2) {
 		samping = atoi(argv[1]);
 		pixel_width = atoi(argv[2]);
@@ -104,7 +107,7 @@ int main(int argc, char *argv[]) {
 	srand((unsigned int)time(NULL));//随机种子
 	const double aspect_ratio = 16.0 / 9.0;
 	const int pixel_height = static_cast<int> (pixel_width / aspect_ratio);
-	const bool is_ssaa = false;   //是否开启4倍超采样（废弃）
+	const bool is_ssaa = false;   //是否开启SSAA（废弃）
     const bool is_random_select = true;
 	std::ofstream out_file;
 	out_file.open(file_name, std::ios::out | std::ios::trunc);
@@ -122,6 +125,11 @@ int main(int argc, char *argv[]) {
 	shared_ptr<metal> metal_ptr(new metal({ 0.85, 0.83, 0.87 }));
 	shared_ptr<light> light_ptr(new light({ 1,1,1 }));
 
+	shared_ptr<glossy> glossy_2(new glossy({ 0.9, 0.4, 0.4 }, 2));
+	shared_ptr<glossy> glossy_4(new glossy({ 0.4, 0.9, 0.4 }, 4));
+	shared_ptr<glossy> glossy_8(new glossy({ 0.4, 0.4, 0.9 }, 8));
+	shared_ptr<glossy> glossy_16(new glossy({ 0.8, 0.9, 0.8 }, 16));
+
 	// world
 	vector<shared_ptr<hitable>> world;
 
@@ -130,11 +138,20 @@ int main(int argc, char *argv[]) {
 	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
 	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
 	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	//world.push_back(make_shared<box_light>(point3(0, 1.98, -2), vec3(1, 0.04, 1), light_ptr));
-	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
-	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
-	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
-	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
+	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1.4, 0.04, 1.4), light_ptr));
+	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), glossy_4));
+	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, glossy_8));
+	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, glossy_2));
+
+	//world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
+	//world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
+	//world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
+	//world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
+	//world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
+	//world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
+	//world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
+	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	//world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
 
 
 	// 相机
