@@ -23,7 +23,7 @@ public:
 		horizontal = vec3(weight, 0., 0.);
 		vertical = vec3(0., height, 0.);
 
-		low_left_corner = point3(-weight / 2, -height / 2, ori.e[2]-focal_lenth);
+		low_left_corner = point3(-weight / 2., -height / 2., ori.e[2]-focal_lenth);
 	}
 
 	ray get_ray(double u, double v) const {

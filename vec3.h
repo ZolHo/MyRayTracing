@@ -115,6 +115,14 @@ public:
 		return rs;
 	}
 
+	// еп╣х
+	bool operator == (const vec3& b) {
+		return (*this - b).lenth() < FLOAT_DIS;
+	}
+	bool operator != (const vec3& b) {
+		return !(*this == b);
+	}
+
 
 public:
 	double e[3];

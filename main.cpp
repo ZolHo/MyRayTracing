@@ -26,6 +26,8 @@ const float RR_p = 0.8;
 int samping = 300; // samping per pixel
 int pixel_width = 1080; // 屏幕宽
 char* file_name = "test.ppm";
+// 其他参数
+//float blur_ind = 1.;
 
 bool muti_hit(const ray& r, const vector<shared_ptr<hitable>>& things, double t_begin, double t_end, hit_info& rec);
 
@@ -40,25 +42,23 @@ T clamp(T x, T min, T max)
 	return x;
 }
 
+// 路径追踪核心递归算法
 color ray_color(const ray& r, const vector<shared_ptr<hitable>>& things) {
 	hit_info rec;
 	color att;
 	ray sca;
 	if (muti_hit(r, things, 0.00001, infinity, rec) && (*(rec.mat_ptr)).scatter(r, rec, att, sca)) {
 		if (rec.mat_ptr->is_light) {
-			//if(!is_RR)
 			return static_cast<light*>(rec.mat_ptr.get())->light_color;
-			//else return static_cast<light*>(rec.mat_ptr.get())->light_color *(1./RR_p);
 		}
 		bool go_on = random_double() < RR_p;
-		if (go_on) {
+		if (go_on) 
 			return att * ray_color(sca, things) * (1. / RR_p);
-		}
-		else return vec3(0, 0, 0);
-
+		else return color(0, 0, 0);
 	}
 	return color(0, 0, 0);
 }
+
 // 处理光线多个物体的求交，返回在前面的交点的hit info
 bool muti_hit(const ray& r, const vector<shared_ptr<hitable>>& things, double t_begin, double t_end, hit_info& rec) {
 	bool is_hit = false;
@@ -89,6 +89,7 @@ void write_color(std::ostream& out, color pixel_color, int samping) {
 	
 }
 
+
 int main(int argc, char *argv[]) {
 	// 传参控制采样数，分辨率， 文件名
 	if (argc > 2) {
@@ -102,7 +103,6 @@ int main(int argc, char *argv[]) {
     const bool is_random_select = true;
 	std::ofstream out_file;
 	out_file.open(file_name, std::ios::out | std::ios::trunc);
-
 	cout << "samping: " << samping << "  resolution: " <<pixel_height<<"*"<< pixel_width << "  file_name: " << file_name << std::endl;
 
 	const int pixel_samping = samping;
@@ -123,25 +123,25 @@ int main(int argc, char *argv[]) {
 	// world
 	vector<shared_ptr<hitable>> world;
 
-	world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
-	world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
-	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
-	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
-	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1.4, 0.04, 1.4), light_ptr));
-	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), glossy_4));
-	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, glossy_8));
-	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, glossy_2));
-
 	//world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
 	//world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
 	//world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
 	//world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
 	//world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	//world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
-	//world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
-	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
-	//world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
+	//world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1.4, 0.04, 1.4), light_ptr));
+	//world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), glossy_4));
+	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, glossy_8));
+	//world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, glossy_2));
+
+	world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
+	world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
+	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
+	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
+	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
+	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
+	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
+	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
 
 
 	// 相机
@@ -153,12 +153,9 @@ int main(int argc, char *argv[]) {
 	out_file << "P3\n" << pixel_width << " " << pixel_height << "\n255\n";
 
 	//Tip：这里因为用用了整数，导致unit_sssaa值为0
-	double unit_ssaa[2] = { 1 / (2.0 * (pixel_width - 1)), 1 / (2.0 * (pixel_height - 1)) };
-	double SSAA[4][2] = { {-1,-1}, {-1, 1}, {1, -1}, {1,1} };
-	for (int i = 0; i < 4; i++) {
-		SSAA[i][0] *= unit_ssaa[0];
-		SSAA[i][1] *= unit_ssaa[1];
-	}
+	double unit_pixel[2] = { 1. / pixel_width , 1. / pixel_height };
+	//cout << unit_pixel[0] << " " << unit_pixel[1] << std::endl;
+
 	int jin_du_tiao = 0;
 	for (int j = pixel_height - 1; j >= 0; --j) {
 		for (int i = 0; i < pixel_width; ++i) {
@@ -167,22 +164,18 @@ int main(int argc, char *argv[]) {
 			u = double(i) / (pixel_width - 1);
 			v = double(j) / (pixel_height - 1);
 			color final_col;
+			color sum_col = color();
 
-			if(is_random_select) {
-				color sum_col = color();
-                for (int p = 0; p < pixel_samping; p++) {
-                    double ut = u + random_double(0,2)*unit_ssaa[0];
-                    double uv = v + random_double(0, 2) * unit_ssaa[1];
-                    r = cam.get_ray(ut, uv);
-					//r = cam.get_ray(u, v);
-                    auto temp = ray_color(r,world);
-                    sum_col+=temp;
-                }
-				final_col = sum_col;
-			} else {
-                final_col = ray_color(cam.get_ray(u, v), world);
+            for (int p = 0; p < pixel_samping; p++) {
+                double ut = u + random_double(0,1)* unit_pixel[0];
+                double vt = v + random_double(0,1) * unit_pixel[1];
+                r = cam.get_ray(ut, vt);
+				//r = cam.get_ray(u, v);
+                auto temp = ray_color(r,world);
+                sum_col+=temp;
+				//if (temp.lenth() > 0.9) temp << (cout);
             }
-
+			final_col = sum_col;
 			write_color(out_file, final_col, pixel_samping);
 		}
 		// 命令行进度条 windows only
