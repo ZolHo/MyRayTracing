@@ -35,11 +35,11 @@ public:
 	}
 	vec3 operator/(const vec3& v) const {
 		vec3 rs;
-		if (fabs(v.e[0]) < FLOAT_DIS) rs.e[0] = infinity;
+		if (fabs(v.e[0]) <= FLOAT_DIS) rs.e[0] = infinity;
 		else rs.e[0] = e[0] / v.e[0];
-		if (fabs(v.e[1]) < FLOAT_DIS) rs.e[1] = infinity;
+		if (fabs(v.e[1]) <= FLOAT_DIS) rs.e[1] = infinity;
 		else rs.e[1] = e[1] / v.e[1];
-		if (fabs(v.e[2]) < FLOAT_DIS) rs.e[2] = infinity;
+		if (fabs(v.e[2]) <= FLOAT_DIS) rs.e[2] = infinity;
 		else rs.e[2] = e[2] / v.e[2];
 		return rs;
 	}
@@ -117,7 +117,7 @@ public:
 
 	// еп╣х
 	bool operator == (const vec3& b) {
-		return (*this - b).lenth() < FLOAT_DIS;
+		return (*this - b).lenth() <= FLOAT_DIS;
 	}
 	bool operator != (const vec3& b) {
 		return !(*this == b);

@@ -11,14 +11,15 @@ using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
 
-inline float my_max(float a, float b) { return a > b ? a : b; }
-inline float my_min(float a, float b) { return a < b ? a : b; }
-const float FLOAT_DIS = 0.000000005;
-//inline float fabs(float a) { return a > 0 ? a : -a; }
 
 //常量
 const double infinity = std::numeric_limits<double>::infinity(); //无穷大
 const double pi = 3.1415926535897932385;
+
+inline float my_max(float a, float b) {return a > b ? a : b; }
+inline float my_min(float a, float b) { return a < b ? a : b; }
+const float FLOAT_DIS = 0.00000001;
+//inline float fabs(float a) { return a > 0 ? a : -a; }
 
 //函数
 inline double degrees_to_radians(double degrees) { //度数到弧度

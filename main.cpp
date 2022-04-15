@@ -113,11 +113,11 @@ int main(int argc, char *argv[]) {
 	shared_ptr<lambertian> lbt_ptr2(new lambertian({ 117. / 255., 49. / 255.,  142. / 255. }));
 	shared_ptr<lambertian> lbt_ptr3(new lambertian({ random_double(), random_double(), random_double() }));
 	shared_ptr<metal> metal_ptr(new metal({ 0.85, 0.83, 0.87 }));
-	shared_ptr<light> light_ptr(new light({ 1,1,1 }));
+	shared_ptr<light> light_ptr(new light({ 3,3,3 }));
 
 	shared_ptr<glossy> glossy_2(new glossy({ 0.9, 0.4, 0.4 }, 2));
 	shared_ptr<glossy> glossy_4(new glossy({ 0.4, 0.9, 0.4 }, 4));
-	shared_ptr<glossy> glossy_8(new glossy({ 0.4, 0.4, 0.9 }, 8));
+	shared_ptr<glossy> glossy_8(new glossy({ 0.9, 0.9, 0.9 }, 8));
 	shared_ptr<glossy> glossy_16(new glossy({ 0.8, 0.9, 0.8 }, 16));
 
 	// world
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
 	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
 	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
+	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(0.5, 0.04, 0.5), light_ptr));
 	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
 	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
 	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
@@ -166,18 +166,20 @@ int main(int argc, char *argv[]) {
 			color final_col;
 			color sum_col = color();
 
-            for (int p = 0; p < pixel_samping; p++) {
-                double ut = u + random_double(0,1)* unit_pixel[0];
-                double vt = v + random_double(0,1) * unit_pixel[1];
-                //r = cam.get_ray(ut, vt);
-				r = cam.get_ray(u, v);
-                auto temp = ray_color(r,world);
-                sum_col+=temp;
-            }
+			for (int p = 0; p < pixel_samping; p++) {
+				double ut = u + random_double(0, 1) * unit_pixel[0];
+				double vt = v + random_double(0, 1) * unit_pixel[1];
+				r = cam.get_ray(ut, vt);
+				//r = cam.get_ray(u, v);
+				auto temp = ray_color(r, world);
+				sum_col += temp;
+			}
 			final_col = sum_col;
+			auto tp_vec = final_col / pixel_samping;
+			
 			write_color(out_file, final_col, pixel_samping);
 		}
-		// 命令行进度条 windows only
+		//命令行进度条 windows only
 		float percent = ((float)(pixel_height - j) / (float)pixel_height) * 100.;
 		if (percent > jin_du_tiao * 5) {
 			if(jin_du_tiao != 0) cout << " -> ";
