@@ -26,6 +26,7 @@ const float RR_p = 0.8;
 int samping = 300; // samping per pixel
 int pixel_width = 1080; // 屏幕宽
 char* file_name = "test.ppm";
+bool is_low_discrepancy_seq = true; // 低差异序列代替随机
 // 其他参数
 //float blur_ind = 1.;
 
@@ -55,6 +56,7 @@ color ray_color(const ray& r, const vector<shared_ptr<hitable>>& things) {
 		if (go_on) 
 			return att * ray_color(sca, things) * (1. / RR_p);
 		else return color(0, 0, 0);
+		
 	}
 	return color(0, 0, 0);
 }
@@ -107,13 +109,13 @@ int main(int argc, char *argv[]) {
 
 	const int pixel_samping = samping;
     shared_ptr<lambertian> lbt_ptr(new lambertian({1-117./255.,1-49./255.,1- 142./255.}));
-	shared_ptr<lambertian> lbt_red(new lambertian({ 0.9,0,0 }));
-	shared_ptr<lambertian> lbt_green(new lambertian({ 0,0.9,0 }));
-	shared_ptr<lambertian> lbt_white(new lambertian({ 0.9,0.9,0.9 }));
+	shared_ptr<lambertian> lbt_red(new lambertian({ 0.5,0,0 }));
+	shared_ptr<lambertian> lbt_green(new lambertian({ 0,0.5,0 }));
+	shared_ptr<lambertian> lbt_white(new lambertian({ 0.6,0.6,0.6 }));
 	shared_ptr<lambertian> lbt_ptr2(new lambertian({ 117. / 255., 49. / 255.,  142. / 255. }));
 	shared_ptr<lambertian> lbt_ptr3(new lambertian({ random_double(), random_double(), random_double() }));
 	shared_ptr<metal> metal_ptr(new metal({ 0.85, 0.83, 0.87 }));
-	shared_ptr<light> light_ptr(new light({ 3,3,3 }));
+	shared_ptr<light> light_ptr(new light({ 2,2,2 }));
 
 	shared_ptr<glossy> glossy_2(new glossy({ 0.9, 0.4, 0.4 }, 2));
 	shared_ptr<glossy> glossy_4(new glossy({ 0.4, 0.9, 0.4 }, 4));
@@ -138,9 +140,10 @@ int main(int argc, char *argv[]) {
 	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
 	world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
 	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(0.5, 0.04, 0.5), light_ptr));
+	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
 	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
-	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	world.push_back(make_shared<box>(point3(1.5, -1.5, 0), vec3(1,1,1), lbt_ptr3));
 	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
 
 
@@ -155,20 +158,30 @@ int main(int argc, char *argv[]) {
 	//Tip：这里因为用用了整数，导致unit_sssaa值为0
 	double unit_pixel[2] = { 1. / pixel_width , 1. / pixel_height };
 	//cout << unit_pixel[0] << " " << unit_pixel[1] << std::endl;
-
+	int idx_low_dis_seq = 0;
 	int jin_du_tiao = 0;
 	for (int j = pixel_height - 1; j >= 0; --j) {
 		for (int i = 0; i < pixel_width; ++i) {
 			// 单个像素内随机采样
-			//TODO: 面试官问用等距代替随机会有什么不同
+			//TODO: 面试官问用等距代替随机会有什么不同 (低差异序列)
 			u = double(i) / (pixel_width - 1);
 			v = double(j) / (pixel_height - 1);
 			color final_col;
 			color sum_col = color();
 
 			for (int p = 0; p < pixel_samping; p++) {
-				double ut = u + random_double(0, 1) * unit_pixel[0];
-				double vt = v + random_double(0, 1) * unit_pixel[1];
+				double ut = u ;
+				double vt = v ;
+				if (is_low_discrepancy_seq) {
+					ut += Halton(0, idx_low_dis_seq) * unit_pixel[0];
+					vt += Halton(1, idx_low_dis_seq) * unit_pixel[1];
+					idx_low_dis_seq++;
+				}
+				else {
+					ut += random_double(0, 1) * unit_pixel[0];
+					vt += random_double(0, 1) * unit_pixel[1];
+				}
+
 				r = cam.get_ray(ut, vt);
 				//r = cam.get_ray(u, v);
 				auto temp = ray_color(r, world);

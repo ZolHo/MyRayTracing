@@ -12,6 +12,7 @@ using std::make_shared;
 using std::sqrt;
 
 
+
 //常量
 const double infinity = std::numeric_limits<double>::infinity(); //无穷大
 const double pi = 3.1415926535897932385;
@@ -34,4 +35,34 @@ inline double random_double() {
 inline double random_double(double min, double max) {
     //[min, max)s
     return min + random_double() * (max - min);
+}
+
+double RadicalInverse(int Base, int i)
+{
+	double Digit, Radical, Inverse;
+	Digit = Radical = 1.0 / (double)Base;
+	Inverse = 0.0;
+	while (i)
+	{
+		// i余Base求出i在"Base"进制下的最低位的数
+		// 乘以Digit将这个数镜像到小数点右边
+		Inverse += Digit * (double)(i % Base);
+		Digit *= Radical;
+
+		// i除以Base即可求右一位的数
+		i /= Base;
+	}
+	return Inverse;
+}
+int NthPrimeNumber(int d) {
+	int pri[] = { 2, 3, 5, 7,11 };
+	if (d < 5) {
+		return pri[d];
+	}
+	return 0;
+}
+double Halton(int Dimension, int Index)
+{
+	// 直接用第Dimension个质数作为底数调用RadicalInverse即可
+	return RadicalInverse(NthPrimeNumber(Dimension), Index);
 }
