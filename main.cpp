@@ -13,6 +13,7 @@
 #include "light_source.h"
 #include <stdio.h>
 #include <fstream>
+#include <chrono>
 using std::cin;
 using std::cout;
 using std::vector;
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]) {
 	shared_ptr<lambertian> lbt_ptr2(new lambertian({ 117. / 255., 49. / 255.,  142. / 255. }));
 	shared_ptr<lambertian> lbt_ptr3(new lambertian({ random_double(), random_double(), random_double() }));
 	shared_ptr<metal> metal_ptr(new metal({ 0.85, 0.83, 0.87 }));
-	shared_ptr<light> light_ptr(new light({ 2,2,2 }));
+	shared_ptr<light> light_ptr(new light({ 10,10,10 }));
 
 	shared_ptr<glossy> glossy_2(new glossy({ 0.9, 0.4, 0.4 }, 2));
 	shared_ptr<glossy> glossy_4(new glossy({ 0.4, 0.9, 0.4 }, 4));
@@ -125,16 +126,6 @@ int main(int argc, char *argv[]) {
 	// world
 	vector<shared_ptr<hitable>> world;
 
-	//world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
-	//world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
-	//world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
-	//world.push_back(make_shared<box>(point3(-5, 0, 0), vec3(4, 8, 8), lbt_green));
-	//world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
-	//world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1.4, 0.04, 1.4), light_ptr));
-	//world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), glossy_4));
-	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, glossy_8));
-	//world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, glossy_2));
-
 	world.push_back(make_shared<box>(point3(0, -4, 0), vec3(20, 4, 20), lbt_white));
 	world.push_back(make_shared<box>(point3(0, 4, 0), vec3(20, 4, 20), lbt_white));
 	world.push_back(make_shared<box>(point3(0, 0, -5), vec3(8, 8, 2), lbt_white));
@@ -142,14 +133,29 @@ int main(int argc, char *argv[]) {
 	world.push_back(make_shared<box>(point3(5, 0, 0), vec3(4, 8, 8), lbt_red));
 	world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
 	world.push_back(make_shared<box>(point3(-1, -0.5, -1.3), vec3(1.4, 3, 1.4), lbt_white));
-	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
-	world.push_back(make_shared<box>(point3(1.5, -1.5, 0), vec3(1,1,1), lbt_ptr3));
+	world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	//world.push_back(make_shared<box>(point3(1.5, -1.5, 0), vec3(1,1,1), glossy_16));
 	world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
+
+	//world.push_back(make_shared<sphere>(point3(0, -4, 0), 2, lbt_white));
+	//world.push_back(make_shared<sphere>(point3(0, 4, 0), 2, lbt_white));
+	//world.push_back(make_shared<sphere>(point3(0, 0, -5), 2, lbt_white));
+	//world.push_back(make_shared<sphere>(point3(-5, 0, 0), 2, lbt_green));
+	//world.push_back(make_shared<sphere>(point3(5, 0, 0), 1, lbt_red));
+	//world.push_back(make_shared<box_light>(point3(0, 1.98, -1.5), vec3(1, 0.04, 1), light_ptr));
+	//world.push_back(make_shared<sphere>(point3(-1, -0.5, -1.3), 2, lbt_white));
+	//world.push_back(make_shared<sphere>(point3(0.5, -1, 0), 1, lbt_ptr3));
+	////world.push_back(make_shared<box>(point3(1.5, -1.5, 0), vec3(1,1,1), glossy_16));
+	//world.push_back(make_shared<sphere>(point3(1.4, 1, -0.4), 0.5, metal_ptr));
 
 
 	// 相机
 	camera cam;
 
+	// 开始计时
+	auto startTime = std::chrono::system_clock::now();
+	
+	
 	// render
 	double u, v;
 	ray r;
@@ -202,6 +208,10 @@ int main(int argc, char *argv[]) {
 			 
 	}
 	cout << " ->  Done!" << std::endl;
+	// 统计运算时间
+	auto endTime = std::chrono::system_clock::now();
+	std::cout << "time:" << std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime).count() <<" s"<< std::endl;
+
 	out_file.close();
     return 0;
 }

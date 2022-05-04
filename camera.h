@@ -27,7 +27,7 @@ public:
 	}
 
 	ray get_ray(double u, double v) const {
-		return ray(ori, low_left_corner + u * horizontal + v * vertical - ori);
+		return ray(ori, (low_left_corner + u * horizontal + v * vertical - ori).unit());
 	}
 
 };
